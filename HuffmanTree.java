@@ -1,3 +1,6 @@
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.PriorityQueue;
 
@@ -6,11 +9,12 @@ public class HuffmanTree {
 	
 	private PriorityQueue<HuffmanNode> inputQueue = new PriorityQueue<HuffmanNode>();
 	
-	private HuffmanNode overAllRoot;
+	private HuffmanNode overallRoot;
 	private HuffmanNode branch;
 	private int[] count;
 	
 	public HuffmanTree(int[] count) {
+		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(System.out));
 		this.count = count;
 		System.out.println(count.length);
 		for (int i = 0; i < count.length; i++) {
@@ -22,7 +26,12 @@ public class HuffmanTree {
 			}
 		}
 		buildTree();
-		System.out.println(countNodes(overAllRoot));
+		try {
+			overallRoot.printTree(out);
+			System.out.println(countNodes(overallRoot) + " Node in Tree.");
+		} catch (IOException e) {
+			System.out.println("BufferedWrite failure during printTree() execution in HuffmanTree object constructor.");
+		}
 	}
 	
 	public void write(PrintStream output) {
@@ -50,7 +59,7 @@ public class HuffmanTree {
 	}
 	
 	private String travelTree(int target) {
-		return travelTree(overAllRoot, target);
+		return travelTree(overallRoot, target);
 	}
 	
 	private String travelTree(HuffmanNode n, int target) {
@@ -101,7 +110,7 @@ public class HuffmanTree {
 			if (!inputQueue.isEmpty()) {
 				buildLevel(n, inputQueue.remove());
 			} else {
-				buildLevel(n, overAllRoot);
+				buildLevel(n, overallRoot);
 			}
 			
 		}
@@ -112,19 +121,19 @@ public class HuffmanTree {
 		q.left = n;
 		q.right = m;
 		q.frequency = q.left.frequency + q.right.frequency;
-		if (overAllRoot == null) {
-			overAllRoot = n;
+		if (overallRoot == null) {
+			overallRoot = n;
 		}
 		else {
 			HuffmanNode o = new HuffmanNode();
-			if (overAllRoot.frequency > q.frequency) {
+			if (overallRoot.frequency > q.frequency) {
 				o.left = q;
-				o.right = overAllRoot;
-				overAllRoot = o;
+				o.right = overallRoot;
+				overallRoot = o;
 			} else {
-				o.left = overAllRoot;
+				o.left = overallRoot;
 				o.right = q;
-				overAllRoot = o;
+				overallRoot = o;
 			}
 		}
 	}
@@ -154,6 +163,8 @@ public class HuffmanTree {
 //		}
 //	}
 	
+	
+	
 	private class HuffmanNode implements Comparable<HuffmanNode>{
 		
 		public int frequency;
@@ -180,5 +191,54 @@ public class HuffmanTree {
 				return 0;
 			}
 		}
+		
+		public void printTree(BufferedWriter out) throws IOException {
+	        if (right != null) {
+	            right.printTree(out, true, "");
+	        }
+	        printNodeValue(out);
+	        if (left != null) {
+	            left.printTree(out, false, "");
+	        }
+	    }
+
+	    private void printNodeValue(BufferedWriter out) throws IOException {
+	        if (ascii == 256) {
+	            out.write("<End Of File>");
+	            out.flush();
+	        } else {
+	            out.write(frequency + " : " + ascii + " :: " +  ((char) ascii));
+	            out.flush();
+	        }
+
+	        out.write('\n');
+	        out.flush();
+	    }
+
+	    // use string and not stringbuffer on purpose as we need to change the indent at each recursion
+	    private void printTree(BufferedWriter out, boolean isRight, String indent) throws IOException {
+	        if (right != null) {
+	            right.printTree(out, true, indent + (isRight ? "        " : " |      "));
+	        }
+
+	        out.write(indent);
+	        out.flush();
+
+	        if (isRight) {
+	            out.write(" /");
+	            out.flush();
+	        } else {
+	            out.write(" \\");
+	            out.flush();
+	        }
+
+	        out.write("----- ");
+	        out.flush();
+	        printNodeValue(out);
+
+	        if (left != null) {
+	            left.printTree(out, false, indent + (isRight ? " |      " : "        "));
+	        }
+	    }
 	}
 }
