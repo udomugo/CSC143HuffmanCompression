@@ -1,6 +1,7 @@
 import java.io.PrintStream;
 import java.util.PriorityQueue;
 
+
 public class HuffmanTree {
 	
 	private PriorityQueue<HuffmanNode> inputQueue = new PriorityQueue<HuffmanNode>();
@@ -21,6 +22,7 @@ public class HuffmanTree {
 			}
 		}
 		buildTree();
+		System.out.println(countNodes(overAllRoot));
 	}
 	
 	public void write(PrintStream output) {
@@ -30,6 +32,21 @@ public class HuffmanTree {
 			}
 		}
 		System.out.println("File Write Completed.");
+	}
+	
+	/**
+	 * Gets the number of nodes of a subtree
+	 *
+	 * @param root
+	 *            the root of the subtree
+	 * @return the number of nodes in the subtree rooted at root
+	 */
+	private int countNodes(HuffmanNode root) {
+		if (root == null) {
+			return 0;
+		} else {
+			return 1 + countNodes(root.left) + countNodes(root.right);
+		}
 	}
 	
 	private String travelTree(int target) {
@@ -44,9 +61,9 @@ public class HuffmanTree {
 		}
 		if (n.left == null && n.right == null && n.ascii == target) {
 			return ":" + n.ascii;
-		} else if (n.left == null && n.right == null){
+		} /*else if (n.left == null && n.right == null){
 			return result;
-		}
+		}*/
 		String left = travelTree(n.left, target);
 		if (left.equals("")) {
 			String right = travelTree(n.right, target);
