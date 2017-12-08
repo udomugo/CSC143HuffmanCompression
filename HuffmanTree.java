@@ -3,44 +3,46 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.PriorityQueue;
+import java.util.TreeMap;
 
 
 public class HuffmanTree {
 	
 	private PriorityQueue<HuffmanNode> inputQueue = new PriorityQueue<HuffmanNode>();
-	
 	private HuffmanNode overallRoot;
-	private HuffmanNode branch;
-	private int[] count;
+	
+	//TreeMap<Integer, HuffmanNode> branches = new TreeMap<Integer,HuffmanNode>();
+	//HuffmanNode leaf;
+	//private int[] count;
 	
 	public HuffmanTree(int[] count) {
 		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(System.out));
-		this.count = count;
-		System.out.println(count.length);
+		//this.count = count;
+		HuffmanNode node;
 		for (int i = 0; i < count.length; i++) {
 			if (count[i] != 0) {
-				HuffmanNode n = new HuffmanNode();
-				n.ascii = i;
-				n.frequency = count[i];
-				inputQueue.add(n);
+				node = new HuffmanNode(i, count[i]);
+				inputQueue.offer(node);
 			}
 		}
+		node = new HuffmanNode(256,1);
+		inputQueue.offer(node);
 		buildTree();
+		overallRoot = inputQueue.poll();
 		try {
+			System.out.println();
 			overallRoot.printTree(out);
-			System.out.println(countNodes(overallRoot) + " Node in Tree.");
+			System.out.println(countNodes(overallRoot) + " Nodes in Tree.");
+			System.out.println();
 		} catch (IOException e) {
 			System.out.println("BufferedWrite failure during printTree() execution in HuffmanTree object constructor.");
 		}
 	}
 	
 	public void write(PrintStream output) {
-		for ( int i = 0; i < count.length; i ++) {
-			if (count[i] != 0) {
-				output.println(travelTree(i));
-			}
-		}
-		System.out.println("File Write Completed.");
+		String result = recordTree();
+		output.println(result);
+		System.out.println("File Write Method Executed.");
 	}
 	
 	/**
@@ -58,112 +60,42 @@ public class HuffmanTree {
 		}
 	}
 	
-	private String travelTree(int target) {
-		return travelTree(overallRoot, target);
+	private String recordTree() {
+		String record = "";
+		return recordTree(overallRoot, record);
 	}
 	
-	private String travelTree(HuffmanNode n, int target) {
+	private String recordTree(HuffmanNode root, String record) {
 		String result = "";
 		
-		if (n == null) {
-			return result;
+		if (root.needsChild()) {
+			return root.ascii + "\n" + record + "\n";
 		}
-		if (n.left == null && n.right == null && n.ascii == target) {
-			return ":" + n.ascii;
-		} /*else if (n.left == null && n.right == null){
-			return result;
-		}*/
-		String left = travelTree(n.left, target);
-		if (left.equals("")) {
-			String right = travelTree(n.right, target);
-			if (!right.equals("")) {
-				result += 1;
-			}
-		} else {
-			result += 0;
+		if (root.isParent()) {
+			result += recordTree(root.left, record + 0);
+			result += recordTree(root.right, record + 1);
 		}
-		
-		
-		
-//		if(n.left != null && n.right == null) {
-//			result = 1 + travelTree(n.right, target);
-//		} else {
-//			result = 0 + travelTree(n.left, target);
-//		}
 		return result;
 	}
 	
-//	public void write(PrintStream output) {
-//		while(!inputQueue.isEmpty()) {
-//			HuffmanNode n = inputQueue.remove();
-//			if (n.frequency !=0) {
-//				output.println(n);
-//			}
-//		}
-//		System.out.println("File Write Completed.");
-//	}
-	
 	private void buildTree() {
-		while(!inputQueue.isEmpty()) {
-			//HuffmanNode n = inputQueue.peek();
-			HuffmanNode n = inputQueue.remove();
-			if (!inputQueue.isEmpty()) {
-				buildLevel(n, inputQueue.remove());
-			} else {
-				buildLevel(n, overallRoot);
-			}
+		while(inputQueue.size() != 1) {
 			
+			HuffmanNode left = inputQueue.poll();
+			HuffmanNode right = inputQueue.poll();
+			inputQueue.offer(buildNode(left, right));
 		}
 	}
 	
-	private void buildLevel(HuffmanNode n, HuffmanNode m) {
-		HuffmanNode q = new HuffmanNode();
-		q.left = n;
-		q.right = m;
-		q.frequency = q.left.frequency + q.right.frequency;
-		if (overallRoot == null) {
-			overallRoot = n;
-		}
-		else {
-			HuffmanNode o = new HuffmanNode();
-			if (overallRoot.frequency > q.frequency) {
-				o.left = q;
-				o.right = overallRoot;
-				overallRoot = o;
-			} else {
-				o.left = overallRoot;
-				o.right = q;
-				overallRoot = o;
-			}
-		}
+	private HuffmanNode buildNode(HuffmanNode left, HuffmanNode right) {
+		
+		HuffmanNode node = new HuffmanNode();
+		node.left = left;
+		node.right = right;
+		node.frequency = node.left.frequency + node.right.frequency;
+		node.ascii = node.frequency;
+		return node;
 	}
-	
-//	private void buildTree() {
-//		while(!inputQueue.isEmpty()) {
-//			HuffmanNode n = inputQueue.peek();
-//			buildLevel(n.frequency);
-//		}
-//	}
-//	
-//	private void buildLevel(int frequencyValue) {
-//		int count = 0;
-//		while(inputQueue.peek().frequency == frequencyValue) {
-//			HuffmanNode n = new HuffmanNode();
-//			n.left = inputQueue.remove();
-//			n.right = inputQueue.remove();
-//			n.frequency = n.left.frequency + n.right.frequency;
-//			if (overAllRoot == null) {
-//				overAllRoot = n;
-//			} else if (overAllRoot.frequency == n.frequency) {
-//				HuffmanNode m = new HuffmanNode();
-//				m.left = n;
-//				m.right = overAllRoot;
-//				overAllRoot = m;
-//			} else if (overAllRoot.frequency >)
-//		}
-//	}
-	
-	
 	
 	private class HuffmanNode implements Comparable<HuffmanNode>{
 		
@@ -172,12 +104,24 @@ public class HuffmanTree {
 		public HuffmanNode left;
 		public HuffmanNode right;
 		
-		
 		public HuffmanNode() {
 		}
 		
+		public HuffmanNode(int ascii, int frequency) {
+			this.ascii = ascii;
+			this.frequency = frequency;
+		}
+		
 		public String toString() {
-			return "" + ascii + "\n" + frequency;
+			return "" + ascii + " : " + frequency;
+		}
+		
+		public boolean isParent() {
+			return (left != null || right != null);
+		}
+		
+		public boolean needsChild() {
+			return (left == null || right == null);
 		}
 
 		@Override
@@ -207,7 +151,8 @@ public class HuffmanTree {
 	            out.write("<End Of File>");
 	            out.flush();
 	        } else {
-	            out.write(frequency + " : " + ascii + " :: " +  ((char) ascii));
+	            //out.write(frequency + " : " + ascii + " :: " +  ((char) ascii));
+	        	out.write(ascii + " : " + frequency);
 	            out.flush();
 	        }
 
