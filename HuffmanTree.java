@@ -3,17 +3,13 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.PriorityQueue;
-import java.util.TreeMap;
+import java.util.Scanner;
 
 
 public class HuffmanTree {
 	
 	private PriorityQueue<HuffmanNode> inputQueue = new PriorityQueue<HuffmanNode>();
 	private HuffmanNode overallRoot;
-	
-	//TreeMap<Integer, HuffmanNode> branches = new TreeMap<Integer,HuffmanNode>();
-	//HuffmanNode leaf;
-	//private int[] count;
 	
 	public HuffmanTree(int[] count) {
 		BufferedWriter out = new BufferedWriter(new OutputStreamWriter(System.out));
@@ -37,6 +33,14 @@ public class HuffmanTree {
 		} catch (IOException e) {
 			System.out.println("BufferedWrite failure during printTree() execution in HuffmanTree object constructor.");
 		}
+	}
+	
+	public HuffmanTree(Scanner input) {
+		
+	}
+	
+	public void decode(BitInputStream input, PrintStream output, int eof) {
+		
 	}
 	
 	public void write(PrintStream output) {
