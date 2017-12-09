@@ -45,6 +45,7 @@ public class Encode {
 			input.close();
 			writeString(codes[CHAR_MAX], output);
 			output.close();
+			System.out.println("File encoding completed.");
 		} catch (IOException e) {
 			System.out.println(e);
 		}
