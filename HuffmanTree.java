@@ -5,7 +5,12 @@ import java.io.PrintStream;
 import java.util.PriorityQueue;
 import java.util.Scanner;
 
-
+/**
+ * Class will create a binary tree using the Huffman Algorithm
+ * 
+ * @author Programmer James
+ *
+ */
 public class HuffmanTree {
 	
 	// Declaring class variables
@@ -127,7 +132,7 @@ public class HuffmanTree {
 			}
 			
 			// Checking if new position is a leaf
-			if (pointer.needsChild()) {
+			if (!pointer.isBranch()) {
 				// Getting ASCII character value
 				result = pointer.ascii;
 			} else {
@@ -202,6 +207,14 @@ public class HuffmanTree {
 		}
 	}
 	
+	/**
+	 * Method takes a HuffmanNode containing an ASCII character value and a String object containing a
+	 * the ASCII character's binary tree path code. The method recursively follows the binary tree path
+	 * and plants the node in the corresponding place in the binary tree.
+	 * 
+	 * @param node
+	 * @param path
+	 */
 	private void growTree(HuffmanNode node, String path) {
 		growTree(overallRoot, node, path);
 	}
@@ -246,6 +259,10 @@ public class HuffmanTree {
 		}
 	}
 	
+	/**
+	 * Method prints out the current HuffmanTree object. Used for internal testing
+	 * purposes, is not a public method.
+	 */
 	private void displayTree() {
 		try {
 			System.out.println();
@@ -257,6 +274,14 @@ public class HuffmanTree {
 		}
 	}
 	
+	/**
+	 * Method will return a String object representing the current HuffmanTree structure.
+	 * The string is formated to display the ASCII character value on the first line
+	 * and the binary tree path code on the following line, making a list of every ASCII
+	 * character contained in the tree in this fashion.
+	 * 
+	 * @return
+	 */
 	private String recordTree() {
 		String record = "";
 		return recordTree(overallRoot, record);
@@ -265,16 +290,22 @@ public class HuffmanTree {
 	private String recordTree(HuffmanNode root, String record) {
 		String result = "";
 		
-		if (root.needsChild()) {
+		if (!root.isBranch()) {
 			return root.ascii + "\n" + record + "\n";
 		}
-		if (root.isParent()) {
+		if (root.isBranch()) {
 			result += recordTree(root.left, record + 0);
 			result += recordTree(root.right, record + 1);
 		}
 		return result;
 	}
 	
+	/**
+	 * Method utilizes a PriorityQueue of HuffmanNodes to create a binary
+	 * tree representing the frequency of ASCII characters' use within a 
+	 * given document.
+	 * 
+	 */
 	private void buildTree() {
 		while(inputQueue.size() != 1) {
 			
@@ -284,6 +315,14 @@ public class HuffmanTree {
 		}
 	}
 	
+	/**
+	 * Method creates new HuffmanNodes when building the initial 
+	 * binary tree of a document file's frequency of ASCII characters.
+	 * 
+	 * @param left
+	 * @param right
+	 * @return
+	 */
 	private HuffmanNode buildNode(HuffmanNode left, HuffmanNode right) {
 		
 		HuffmanNode node = new HuffmanNode();
@@ -294,35 +333,58 @@ public class HuffmanTree {
 		return node;
 	}
 	
+	/**
+	 * Private internal class to construct new HuffmanNodes for use in a HuffmanTree object.
+	 * @author Programmer James
+	 *
+	 */
 	private class HuffmanNode implements Comparable<HuffmanNode>{
 		
+		// Declaring class variables
 		public int frequency;
 		public int ascii;
 		public HuffmanNode left;
 		public HuffmanNode right;
 		
+		/**
+		 * Default constructor requiring no parameters
+		 */
 		public HuffmanNode() {
 			this.ascii = 0;
 			this.frequency = 0;
 		}
 		
+		/**
+		 * Constructor takes an integer containing an ASCII character value and an integer representing
+		 * the ASCII character's frequency of occurrence.
+		 * 
+		 * @param ascii
+		 * @param frequency
+		 */
 		public HuffmanNode(int ascii, int frequency) {
 			this.ascii = ascii;
 			this.frequency = frequency;
 		}
 		
+		/**
+		 * Method returns a String representation of the the HuffmanNode object.
+		 */
 		public String toString() {
 			return "" + ascii + " : " + frequency;
 		}
 		
-		public boolean isParent() {
-			return (left != null || right != null);
+		/**
+		 * Method returns true if the HuffmanNode has a left and a right child HuffmanNode.
+		 * Otherwise returns false that the HuffmanNode is a branch of the binary tree.
+		 * @return
+		 */
+		public boolean isBranch() {
+			return (left != null && right != null);
 		}
 		
-		public boolean needsChild() {
-			return (left == null || right == null);
-		}
-
+		/**
+		 * Method compares a HuffmanNode object with another HuffmanNode object.
+		 */
 		@Override
 		public int compareTo(HuffmanNode o) {
 			// TODO Auto-generated method stub
@@ -335,6 +397,9 @@ public class HuffmanTree {
 			}
 		}
 		
+		// The last three methods are code borrowed from StackOverflow
+		// They allow the binary tree to be displayed visually for teting
+		//purposes
 		public void printTree(BufferedWriter out) throws IOException {
 	        if (right != null) {
 	            right.printTree(out, true, "");
@@ -344,7 +409,10 @@ public class HuffmanTree {
 	            left.printTree(out, false, "");
 	        }
 	    }
-
+		
+		// The last three methods are code borrowed from StackOverflow
+		// They allow the binary tree to be displayed visually for teting
+		//purposes
 	    private void printNodeValue(BufferedWriter out) throws IOException {
 	        if (ascii == 256) {
 	            out.write("<End Of File>");
@@ -359,6 +427,10 @@ public class HuffmanTree {
 	        out.flush();
 	    }
 
+	    // The last three methods are code borrowed from StackOverflow
+ 		// They allow the binary tree to be displayed visually for teting
+ 		//purposes
+	    
 	    // use string and not stringbuffer on purpose as we need to change the indent at each recursion
 	    private void printTree(BufferedWriter out, boolean isRight, String indent) throws IOException {
 	        if (right != null) {
